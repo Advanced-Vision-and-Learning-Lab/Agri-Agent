@@ -30,6 +30,18 @@ evidence_timeseries.csv
 one_agent_reporter.json
 agent_transcript.jsonl
 
+# Allow committing curated results under results/
+!results/
+!results/**/
+!results/**/discovery_report.json
+!results/**/discovery_report.md
+!results/**/evidence_timeseries.csv
+!results/**/agent_transcript.jsonl
+!results/**/one_agent_reporter.json
+!results/**/timeseries.csv
+!results/**/timeseries.json
+!results/**/summary_for_ai.md
+
 # OS
 .DS_Store
 Thumbs.db
