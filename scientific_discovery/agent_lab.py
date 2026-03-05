@@ -371,7 +371,19 @@ def run_multi_agent_lab(
             out = run_agent_llm(role, evidence, round_label, critique_of=critique_of, transcript=transcript)
             out["llm_used"] = True
             return out
-        return run_agent_fallback(role, evidence, round_label, critique_of=critique_of)
+        out = run_agent_fallback(role, evidence, round_label, critique_of=critique_of)
+        if transcript is not None:
+            transcript.append(
+                {
+                    "agent": role.name,
+                    "round": round_label,
+                    "llm_used": False,
+                    "evidence": evidence,
+                    "critique_of": critique_of,
+                    "output": out,
+                }
+            )
+        return out
 
     round1 = {
         "qc": run(QC_AGENT, "round1"),

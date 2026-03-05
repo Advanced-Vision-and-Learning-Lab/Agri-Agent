@@ -20,6 +20,7 @@ build/
 # Outputs (keep repo clean; users generate these locally)
 SorghumO_over_time_results/
 SorghumO_over_time_discovery/
+discovery_output*/
 timeseries.csv
 timeseries.json
 summary_for_ai.md
@@ -27,6 +28,7 @@ discovery_report.json
 discovery_report.md
 evidence_timeseries.csv
 one_agent_reporter.json
+agent_transcript.jsonl
 
 # OS
 .DS_Store

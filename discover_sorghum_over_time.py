@@ -23,6 +23,11 @@ if __name__ == "__main__":
     ap.add_argument("--results-dir", type=Path, default=None, help="Directory with **/results.json")
     ap.add_argument("--out-dir", type=Path, default=None, help="Output directory for discovery artifacts")
     ap.add_argument("--no-llm", action="store_true", help="Disable LLM calls (use fallback outputs)")
+    ap.add_argument(
+        "--save-transcript",
+        action="store_true",
+        help="Write agent prompts/responses to out_dir/agent_transcript.jsonl (no API keys).",
+    )
     args = ap.parse_args()
 
     base = Path(__file__).parent
@@ -32,4 +37,6 @@ if __name__ == "__main__":
     argv = ["--results-dir", str(results_dir), "--out-dir", str(out_dir)]
     if args.no_llm:
         argv.append("--no-llm")
+    if args.save_transcript:
+        argv.append("--save-transcript")
     raise SystemExit(main(argv))

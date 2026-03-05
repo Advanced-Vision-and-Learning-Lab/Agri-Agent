@@ -153,6 +153,17 @@ def main(argv: list[str] | None = None) -> int:
         out = run_agent_fallback(REPORTER_AGENT, evidence, round_label="single_agent")
         out["llm_used"] = False
         out["error"] = f"LLM failed: {type(e).__name__}: {e}"
+        if transcript is not None:
+            transcript.append(
+                {
+                    "agent": REPORTER_AGENT.name,
+                    "round": "single_agent",
+                    "llm_used": False,
+                    "evidence": evidence,
+                    "error": out.get("error"),
+                    "output": out,
+                }
+            )
 
     out_path = out_dir / "one_agent_reporter.json"
     out_path.write_text(json.dumps(out, indent=2), encoding="utf-8")
