@@ -1,6 +1,8 @@
-# LLM-Discovery
+# Agri-Agent
 
 **LLM-powered scientific discovery over plant phenotyping time-series data.**
+
+Part of the [Advanced Vision and Learning Lab](https://github.com/Advanced-Vision-and-Learning-Lab) research.
 
 This package turns per-image `results.json` outputs from a phenotyping pipeline into:
 - a cleaned time-series evidence table
@@ -25,8 +27,8 @@ The discovery pipeline consumes `results.json` files produced by plant phenotypi
 
 ```bash
 # Clone the repo
-git clone https://github.com/fahimehorvatinia/LLM-Discovery.git
-cd LLM-Discovery
+git clone https://github.com/Advanced-Vision-and-Learning-Lab/Agri-Agent.git
+cd Agri-Agent
 
 # Create virtual environment (recommended)
 python -m venv .venv
@@ -125,7 +127,7 @@ Without `LLM_API_KEY`, the pipeline uses **fallback outputs** (no LLM calls).
 ## Project Structure
 
 ```
-LLM-Discovery/
+Agri-Agent/
 ├── scientific_discovery/       # Core discovery module
 │   ├── __init__.py
 │   ├── io.py                  # Load results.json
@@ -158,4 +160,5 @@ No heavy ML dependencies; works with any phenotyping pipeline that outputs `resu
 If you use this software in your research, please cite appropriately.
 
 **Author:** Fahime Horvatinia  
-**Repository:** https://github.com/fahimehorvatinia/LLM-Discovery
+**Organization:** Advanced Vision and Learning Lab  
+**Repository:** https://github.com/Advanced-Vision-and-Learning-Lab/Agri-Agent
