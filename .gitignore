@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+venv/
+env/
+.env
+*.egg-info/
+dist/
+build/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Outputs (keep repo clean; users generate these locally)
+SorghumO_over_time_results/
+SorghumO_over_time_discovery/
+timeseries.csv
+timeseries.json
+summary_for_ai.md
+discovery_report.json
+discovery_report.md
+evidence_timeseries.csv
+one_agent_reporter.json
+
+# OS
+.DS_Store
+Thumbs.db
