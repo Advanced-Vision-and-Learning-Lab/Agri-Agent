@@ -23,6 +23,12 @@ The discovery pipeline consumes `results.json` files produced by plant phenotypi
 
 ---
 
+## PhD-level thesis step (add one thing)
+
+Add a **Hypothesis–Test loop**: after the agents propose discoveries, a dedicated **Verifier Agent** automatically turns each claim into *falsifiable hypotheses* and runs *pre-registered statistical checks* (e.g., permutation tests, holdout timepoints, bootstrap stability, multi-plant replication), then forces the Reporter to **revise confidence** and label claims as *supported / inconclusive / rejected* with exact test outputs.
+
+---
+
 ## Installation
 
 ```bash
