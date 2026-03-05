@@ -78,6 +78,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--require-llm", action="store_true", help="Fail if LLM call does not succeed (no fallback output).")
     ap.add_argument("--max-timepoints", type=int, default=14, help="Limit dates passed to the LLM (keeps prompts small).")
     ap.add_argument("--full-signals", action="store_true", help="Use all auto-picked signals instead of the minimal 3-signal set.")
+    ap.add_argument(
+        "--save-transcript",
+        action="store_true",
+        help="Write agent prompt/response to out_dir/agent_transcript.jsonl (no API keys).",
+    )
     args = ap.parse_args(argv)
 
     base = Path(__file__).parent
@@ -138,8 +143,9 @@ def main(argv: list[str] | None = None) -> int:
         "task": "Write ONE conservative discovery summary (1–3 bullets) backed by the evidence. Use only the evidence fields; do not guess causes.",
     }
 
+    transcript = [] if args.save_transcript else None
     try:
-        out = run_agent_llm(REPORTER_AGENT, evidence, round_label="single_agent")
+        out = run_agent_llm(REPORTER_AGENT, evidence, round_label="single_agent", transcript=transcript)
         out["llm_used"] = True
     except Exception as e:
         if args.require_llm:
@@ -150,6 +156,9 @@ def main(argv: list[str] | None = None) -> int:
 
     out_path = out_dir / "one_agent_reporter.json"
     out_path.write_text(json.dumps(out, indent=2), encoding="utf-8")
+    if transcript is not None:
+        tpath = out_dir / "agent_transcript.jsonl"
+        tpath.write_text("\n".join(json.dumps(x, ensure_ascii=False) for x in transcript) + "\n", encoding="utf-8")
     print(f"Wrote: {out_path}")
     print(json.dumps(out, indent=2)[:2000])
     return 0

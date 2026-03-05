@@ -185,7 +185,14 @@ def _extract_json(text: str) -> Dict[str, Any]:
     raise ValueError("Could not parse JSON from LLM output.")
 
 
-def run_agent_llm(role: AgentRole, evidence: Dict[str, Any], round_label: str, critique_of: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+def run_agent_llm(
+    role: AgentRole,
+    evidence: Dict[str, Any],
+    round_label: str,
+    *,
+    critique_of: Optional[Dict[str, Any]] = None,
+    transcript: Optional[List[Dict[str, Any]]] = None,
+) -> Dict[str, Any]:
     cfg = _default_llm_config()
     if not cfg["api_key"]:
         raise RuntimeError("LLM_API_KEY not set")
@@ -223,7 +230,27 @@ def run_agent_llm(role: AgentRole, evidence: Dict[str, Any], round_label: str, c
         {"role": "system", "content": "You are a scientific analysis assistant. Output JSON only."},
         {"role": "user", "content": prompt},
     ]
-    text = _call_chat_completions(api_key=str(cfg["api_key"]), api_base=str(cfg["api_base"]), model=str(cfg["model"]), messages=messages)
+    text = _call_chat_completions(
+        api_key=str(cfg["api_key"]),
+        api_base=str(cfg["api_base"]),
+        model=str(cfg["model"]),
+        messages=messages,
+    )
+
+    if transcript is not None:
+        transcript.append(
+            {
+                "agent": role.name,
+                "round": round_label,
+                "llm": {
+                    "api_base": str(cfg.get("api_base")),
+                    "model": str(cfg.get("model")),
+                },
+                "messages": messages,
+                "raw_response_text": text,
+            }
+        )
+
     return _extract_json(text)
 
 
@@ -325,7 +352,12 @@ def run_agent_fallback(role: AgentRole, evidence: Dict[str, Any], round_label: s
     }
 
 
-def run_multi_agent_lab(evidence: Dict[str, Any], *, use_llm_if_available: bool = True) -> Dict[str, Any]:
+def run_multi_agent_lab(
+    evidence: Dict[str, Any],
+    *,
+    use_llm_if_available: bool = True,
+    transcript: Optional[List[Dict[str, Any]]] = None,
+) -> Dict[str, Any]:
     """
     2-round debate:
     - Round 1: each agent proposes
@@ -336,7 +368,7 @@ def run_multi_agent_lab(evidence: Dict[str, Any], *, use_llm_if_available: bool 
 
     def run(role: AgentRole, round_label: str, critique_of: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         if llm_available:
-            out = run_agent_llm(role, evidence, round_label, critique_of=critique_of)
+            out = run_agent_llm(role, evidence, round_label, critique_of=critique_of, transcript=transcript)
             out["llm_used"] = True
             return out
         return run_agent_fallback(role, evidence, round_label, critique_of=critique_of)

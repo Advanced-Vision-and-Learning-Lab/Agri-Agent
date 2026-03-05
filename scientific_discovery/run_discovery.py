@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -55,6 +56,11 @@ def main(argv: Optional[List[str]] = None) -> int:
     ap.add_argument("--lag-min", type=int, default=-10, help="Minimum lag (days) to test")
     ap.add_argument("--lag-max", type=int, default=10, help="Maximum lag (days) to test")
     ap.add_argument("--no-llm", action="store_true", help="Disable LLM calls even if LLM_API_KEY is set")
+    ap.add_argument(
+        "--save-transcript",
+        action="store_true",
+        help="Write agent prompts/responses to out_dir/agent_transcript.jsonl (no API keys).",
+    )
     args = ap.parse_args(argv)
 
     records = load_all(args.results_dir)
@@ -123,7 +129,8 @@ def main(argv: Optional[List[str]] = None) -> int:
         "lag_relationships": lag_relationships[:20],
     }
 
-    agent_lab = run_multi_agent_lab(evidence, use_llm_if_available=not args.no_llm)
+    transcript: Optional[List[Dict[str, Any]]] = [] if args.save_transcript else None
+    agent_lab = run_multi_agent_lab(evidence, use_llm_if_available=not args.no_llm, transcript=transcript)
 
     date_range = f"{df['date'].min().date()} → {df['date'].max().date()}"
     out_dir = args.out_dir
@@ -131,6 +138,13 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     evidence_csv = out_dir / "evidence_timeseries.csv"
     df.to_csv(evidence_csv, index=False)
+
+    transcript_path: Optional[Path] = None
+    if transcript is not None:
+        transcript_path = out_dir / "agent_transcript.jsonl"
+        with open(transcript_path, "w", encoding="utf-8") as f:
+            for entry in transcript:
+                f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
     report: Dict[str, Any] = {
         "summary": {
@@ -141,6 +155,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         },
         "evidence_overview": {
             "evidence_timeseries_csv": str(evidence_csv),
+            **({"agent_transcript_jsonl": str(transcript_path)} if transcript_path else {}),
         },
         "qc_flags": qc,
         "changepoints": cps[:50],
